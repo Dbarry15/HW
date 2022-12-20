@@ -1,0 +1,56 @@
+public class HashTableChaining {
+    private static final int INITIAL_SIZE = 16;
+    private static final double LOAD_FACTOR = 0.75;
+    
+    private List<Entry>[] table;
+    private int size;
+    
+    public HashTableChaining() {
+        table = (List<Entry>[]) new List[INITIAL_SIZE];
+        size = 0;
+    }
+    
+    public void put(int key, int value) {
+        int index = hash(key) % table.length;
+        if (table[index] == null) {
+            table[index] = new LinkedList<>();
+        }
+        List<Entry> bucket = table[index];
+        for (Entry entry : bucket) {
+            if (entry.key == key) {
+                entry.value = value;
+                return;
+            }
+        }
+        bucket.add(new Entry(key, value));
+        size++;
+        if (size > table.length * LOAD_FACTOR) {
+            resizeTable();
+        }
+    }
+    
+    public int get(int key) {
+        int index = hash(key) % table.length;
+        if (table[index] == null) {
+            return -1;
+        }
+        List<Entry> bucket = table[index];
+        for (Entry entry : bucket) {
+            if (entry.key == key) {
+                return entry.value;
+            }
+        }
+        return -1;
+    }
+    
+    public void remove(int key) {
+        int index = hash(key) % table.length;
+        if (table[index] == null) {
+            return;
+        }
+        List<Entry> bucket = table[index];
+        for (Entry entry : bucket) {
+            if (entry.key == key) {
+                bucket.remove(entry);
+                size--;
+                return
