@@ -1,0 +1,56 @@
+public class HashTableOpenAddressing {
+    private static final int INITIAL_SIZE = 16;
+    private static final double LOAD_FACTOR = 0.75;
+    private static final int MAX_PROBES = 8;
+    
+    private Entry[] table;
+    private int size;
+    
+    public HashTableOpenAddressing() {
+        table = new Entry[INITIAL_SIZE];
+        size = 0;
+    }
+    
+    public void put(int key, int value) {
+        int index = findIndex(key);
+        if (index == -1) {
+            return;
+        }
+        table[index] = new Entry(key, value);
+        size++;
+        if (size > table.length * LOAD_FACTOR) {
+            resizeTable();
+        }
+    }
+    
+    public int get(int key) {
+        int index = findIndex(key);
+        if (index == -1 || table[index] == null) {
+            return -1;
+        }
+        return table[index].value;
+    }
+    
+    public void remove(int key) {
+        int index = findIndex(key);
+        if (index == -1 || table[index] == null) {
+            return;
+        }
+        table[index] = null;
+        size--;
+    }
+    
+    private int findIndex(int key) {
+        int index = hash(key) % table.length;
+        int probes = 0;
+        while (table[index] != null && table[index].key != key) {
+            index = (index + 1) % table.length;
+            probes++;
+            if (probes > MAX_PROBES) {
+                return -1;
+            }
+        }
+        return index;
+    }
+    
+    private void resizeTable() {
